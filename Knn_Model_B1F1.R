@@ -13,14 +13,7 @@ wifiB1F1 <- wifi %>%
   filter(BUILDINGID == 1) %>%
   filter(FLOOR == 1)
 
-#visualize B1F1
-boxplot(wifiB1F1[,1:25])
-boxplot(wifiB1F1[,26:50])
-boxplot(wifiB1F1[,51:75])       
-boxplot(wifiB1F1[,76:100]) 
-boxplot(wifiB1F1[,101:150]) 
 
-summary(wifiB1F1$WAP090)
 
 #remove all features other than WAPs and Latitude
 B1F1LAT <- select(wifiB1F1, WAP001:WAP520, LATITUDE)
@@ -41,7 +34,7 @@ fitControl <- trainControl(method = "repeatedcv", number = 10, repeats = 2)
 kNN_Model1 <- train(LATITUDE~., data = training, method = "knn", trControl=fitControl)
 
 #predictor variables
-predictors(kNN_Model)
+predictors(kNN_Model1)
 
 #make predictions
 testPred_kNN1 <- predict(kNN_Model1, testing)
@@ -53,7 +46,7 @@ postResample(testPred_kNN1, testing$LATITUDE)
 #6.281632 0.974411 3.509039 
 
 #view kNN model
-kNN_Model
+kNN_Model1
 
 
 #plot predicted verses actual
@@ -104,5 +97,13 @@ abline(1,1)
 summary(testPred_kNN2)
 summary(testing2$LONGITUDE)
 
+#deploy model
 
+wifiTEST <- select(wifiB1F1, WAP001:WAP520)
+
+wifiTestLat <- predict(kNN_Model1, wifiTEST)
+wifiTEST$LAT <- wifiTestLat
+
+wifiTestLon <- predict(kNN_Model2, wifiTEST)
+wifiTEST$LON <- wifiTestLon
 
