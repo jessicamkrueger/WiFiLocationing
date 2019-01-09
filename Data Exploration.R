@@ -1,8 +1,11 @@
 #Wifi Locationing Task
 
-#load libraries
 library(dplyr)
 library(ggplot2)
+library(caret)
+library(gridExtra)
+library(grid)
+library(tidyr)
 
 #Load the necessary data
 setwd("~/Ubiqum/Project 4/Wifi Task/UJIndoorLoc")
@@ -104,4 +107,61 @@ WAPtest <- select(wifi, WAP240:WAP245)
 
 wifi$WAP240 < 100
 
-summary(wifi$WAP001)
+summary(wifi$WAP429)
+
+hist(wifi$WAP111)
+
+
+#remove all columns that have only 100s (no signal)
+means <- colMeans(wifi[1:520]) #finds mean of each column
+mean100 <- which(means == 100) #there are 55 WAPs with mean 100
+
+WAPs <- names(mean100)
+
+wifi2 <- select(wifi, -WAPs) #removes all WAPs with only 100s
+
+#now change 100 values to -101
+wifi2[wifi2==100] <- -101
+
+#find columns that have low max WAP value
+maxValue <- apply(wifi2, 2, function(x) max(x, na.rm = TRUE))
+options(scipen=999)
+
+#which max values are 80 orless (meaning very poor signal)
+maxValue
+max80 <- which(maxValue <=-80) #145 WAPs with a max value of -80 or less 
+max80
+WAPs80 <- names(max80)
+WAPs80 <- WAPs80[1:144] #removes longitude from the list
+
+wifi3 <- select(wifi2, -WAPs80) #removes all WAPs with max dbm of 80 or less
+saveRDS(wifi3, "wifi3.rds")
+
+maxCheck <- apply(wifi3, 2, function(x) max(x, na.rm = TRUE))
+summary(maxCheck[1:320]) #checks max on only WAPs
+
+
+#Remove columns that have max WAP of -68 or less
+max67 <- which(maxValue <=-68) #145 WAPs with a max value of -80 or less 
+max67
+WAPs67 <- names(max67)
+WAPs67 <- WAPs67[1:204] #removes longitude from the list
+
+wifi4 <- select(wifi2, -WAPs67) #removes all WAPs with max dbm of 80 or less
+saveRDS(wifi4, "wifi4.rds")
+
+maxCheck <- apply(wifi4, 2, function(x) max(x, na.rm = TRUE))
+summary(maxCheck[1:261]) #checks max on only WAPs
+
+
+#locate values > 30 dBM in dataframe
+maxValue3 <- apply(wifi3, 2, function(x) max(x, na.rm = TRUE))
+options(scipen=999)
+maxValue3
+
+max30 <- which(maxValue > -30)
+max30
+
+which(wifi3$WAP011 > -30)
+wifi3[2325,5] #value of -13 in this cell
+wifi3[2327,5] #value of -11 in this cell

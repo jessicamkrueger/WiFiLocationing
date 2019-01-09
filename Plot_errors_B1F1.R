@@ -40,9 +40,13 @@ ggplot(all, aes(Longitude, Latitude)) +
   geom_point(aes(color=LaType))
 
 
-#plot lattitude and longitude of the entire data set along with model predictions
+#plot latitude and longitude of the entire data set along with model predictions
 ggplot() +
   geom_point(aes(x=wifiTEST$LON, y=wifiTEST$LAT), color = "red") +
   geom_point(aes(wifi$LONGITUDE, wifi$LATITUDE))
-  
+
+#plot predictions against actual values for B1F1
+ggplot() +
+  geom_point(aes(x=wifiTEST$LON, y=wifiTEST$LAT), color = "red") +
+  geom_point(aes(wifiB1F1$LONGITUDE, wifiB1F1$LATITUDE))
   
