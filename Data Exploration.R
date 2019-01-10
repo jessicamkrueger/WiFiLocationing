@@ -135,6 +135,13 @@ WAPs80 <- names(max80)
 WAPs80 <- WAPs80[1:144] #removes longitude from the list
 
 wifi3 <- select(wifi2, -WAPs80) #removes all WAPs with max dbm of 80 or less
+wifi3$BUILDINGID <- as.factor(wifi3$BUILDINGID)
+wifi3$FLOOR <- as.factor(wifi3$FLOOR)
+wifi3$SPACEID <- as.factor(wifi3$SPACEID)
+wifi3$RELATIVEPOSITION <- as.factor(wifi3$RELATIVEPOSITION)
+wifi3$USERID <- as.factor(wifi3$USERID)
+wifi3$PHONEID <- as.factor(wifi3$PHONEID)
+
 saveRDS(wifi3, "wifi3.rds")
 
 maxCheck <- apply(wifi3, 2, function(x) max(x, na.rm = TRUE))
@@ -161,6 +168,7 @@ maxValue3
 
 max30 <- which(maxValue > -30)
 max30
+summary(max30)
 
 which(wifi3$WAP011 > -30)
 wifi3[2325,5] #value of -13 in this cell
