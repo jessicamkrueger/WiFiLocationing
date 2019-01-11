@@ -29,9 +29,19 @@ sum(wifi30sa > -30) #775 values returned, 482 rows
 #Pattern by USERID?
 ggplot(wifi30s, aes(USERID)) +
   geom_bar() +
-  labs(title = "Distribution of Users Registering WAP Values Over -30") +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                 panel.background = element_blank(), axis.line = element_line(colour = "gray")) 
+  labs(title = "Distribution of Users Registering WAP Values Over -30",
+       y= "Count of Observations") +
+  theme(panel.grid.major = element_blank(), 
+              panel.grid.minor = element_blank(),
+              panel.background = element_blank(), 
+              axis.ticks.y = element_blank(),
+              axis.ticks.x = element_blank(),
+              axis.line =  element_blank(),
+              axis.text.x = element_text(colour = "light gray"),
+              axis.text.y = element_text(colour = "light gray"),
+              axis.title.x = element_text(colour = "light gray"),
+              axis.title.y = element_text(colour = "light gray"),
+              plot.title = element_text(color= "dark gray"))
 #user 6 has majority of observations that are greater than -30
 
 #Pattern by USERID?
@@ -179,15 +189,19 @@ BadTotals$dataTotal <- c(2737, 192, 980, 913, 1596, 498, 1032)
 BadTotals <- mutate(BadTotals, Percent = total/dataTotal)
 ggplot(BadTotals, aes(USERID, Percent)) +
   geom_col() +
-  labs(title = "Percent of Observations with Values Over -30") +
+  labs(title = "Percent of Observations by User with Values Over -30",
+       y= "Percent of Total Observations") +
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
         panel.background = element_blank(), 
         axis.ticks.y = element_blank(),
         axis.ticks.x = element_blank(),
-        axis.line = element_line(colour = "light gray"),
+        axis.line =  element_blank(),
         axis.text.x = element_text(colour = "light gray"),
-        axis.text.y = element_text(colour = "light gray")) 
+        axis.text.y = element_text(colour = "light gray"),
+        axis.title.x = element_text(colour = "light gray"),
+        axis.title.y = element_text(colour = "light gray"),
+        plot.title = element_text(color= "dark gray"))
 #user 6 is by far the largest percent of bad data, close to 50%
 #all other users have less than 4% of bad data
 
@@ -229,3 +243,88 @@ wifi5Tidy <- gather(wifi5, WAP, Value, WAP006:WAP517)
 ggplot(wifi5Tidy, aes(Value)) +
   geom_bar() +
   scale_x_continuous(limits = c(-30,0))
+
+
+#find observations that don't have any signal registered on any WAP
+#if there is no signal at all, the row would have a sum of -32421
+noSignal <- wifi5[1:321]
+colnames(noSignal)
+noSignal1 <- rowSums(noSignal)
+noSignal2 <- which(noSignal1 == -32421)
+noSignal2 #vector of all rows without any signal registered
+
+wifi5[84,]
+sum(wifi5[84,] == -101) #321
+sum(wifi5[84,1:321] != -101) #0
+
+#remove all rows that have no registered signal strength
+wifi6 <- wifi5[-noSignal2,]
+saveRDS(wifi6, "wifi6.rds") 
+
+#create data frame of just rows with no signal to compare them
+wifi5 <- readRDS("wifi5.rds")
+noSignalRows <- wifi5[noSignal2,]
+saveRDS(noSignalRows, "noSignalRows") 
+noSignalRows <- readRDS("noSignalRows.rds")
+
+ggplot(noSignalRows, aes(USERID)) +
+  geom_bar() +
+  labs(y= "", title = "Count of Observations by User with Zero Signal Measured") +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(), 
+        axis.ticks.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.line = element_line(colour = "light gray"),
+        axis.text.x = element_text(colour = "light gray"),
+        axis.text.y = element_text(colour = "light gray"),
+        axis.title.x = element_text(colour = "light gray"),
+        plot.title = element_text(color= "dark gray"))
+
+#mostly user 8 and user 17
+
+ggplot(noSignalRows, aes(BUILDINGID)) +
+  geom_bar(aes(fill=USERID)) +
+  labs(y= "", title = "Count of Observations by Building with Zero Signal Measured") +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(), 
+        axis.ticks.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.line = element_line(colour = "light gray"),
+        axis.text.x = element_text(colour = "light gray"),
+        axis.text.y = element_text(colour = "light gray")) 
+
+#mostly building 1 and 2
+
+ggplot() +
+  geom_point(aes(wifi6$LONGITUDE, wifi6$LATITUDE), color = "light gray") +
+  geom_point(aes(noSignalRows$LONGITUDE, noSignalRows$LATITUDE), color = "dark blue", size = 2) +
+  labs(y= "Latitude",
+       x= "Longtitude",
+       title = "Observations with Zero Signal Measured") +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(), 
+        axis.ticks.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.line =  element_blank(),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.x = element_text(colour = "light gray"),
+        axis.title.y = element_text(colour = "light gray"),
+        plot.title = element_text(color= "dark gray"))
+
+
+#check timestamps
+noSignalRows$TIMESTAMP <- as.POSIXct(noSignalRows$TIMESTAMP, origin = "1970-01-01")
+
+ggplot(noSignalRows, aes(TIMESTAMP)) +
+  geom_histogram() #mostly on June 20
+
+str(wifi6[322:330])
+wifi6$TIMESTAMP <- as.POSIXct(wifi6$TIMESTAMP, origin = "1970-01-01")
+
+ggplot(wifi6, aes(TIMESTAMP)) +
+  geom_histogram() #most observations in general happened on June 20 though
+
