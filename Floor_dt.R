@@ -26,18 +26,19 @@ training2 <- FLR[inTraining2,]
 testing2 <- FLR[-inTraining2,]
 
 #10 fold cross validation
-fitControl2 <- trainControl(method = "repeatedcv", number = 1, repeats = 1)
+fitControl2 <- trainControl(method = "repeatedcv", number = 2, repeats = 1)
+#putting 1 for number will give you an error, should always be at least 2 :)
 
 #train classification model
-F_dt <- train(FLOOR~., data = training2, method = "rpart", trControl=fitControl2)
+F_rf <- train(FLOOR~., data = training2, method = "cforest", trControl=fitControl2)
 
 #make predictions
-predF_dt <- predict(F_dt, testing2)
+predF_rf <- predict(F_rf, testing2)
 
 #performace measurment
-postResample(predF_dt, testing2$FLOOR)
+postResample(predF_rf, testing2$FLOOR)
 # output
 
 
 #check confusion matrix
-confusionMatrix(predF_gbm, testing2$FLOOR)
+confusionMatrix(predF_rf, testing2$FLOOR)
