@@ -66,13 +66,19 @@ postResample(predF_gbmB2, testing2$FLOOR)
 
 # output
 #Building 0
-
+Accuracy     Kappa 
+0.9954198    0.9938647 
+#made 6 errors
 
 #Building 1
-
+Accuracy     Kappa 
+0.9930070    0.9905781 
+#9 errors
 
 #Building 2
- 
+Accuracy    Kappa 
+1           1 
+#noerrors
 
 #test on validation data
 
@@ -82,13 +88,21 @@ setwd("~/Ubiqum/Project 4/Wifi Task/UJIndoorLoc")
 Val <- readRDS("ValClean.rds")
 wifi6 <- readRDS("wifi6.rds")
 
-ValB0 <- filter(Val, BUILDINGID == 0)
-ValB1<- filter(Val, BUILDINGID == 1)
-ValB2 <- filter(Val, BUILDINGID == 2)
+ValB0 <-  Val %>%
+  filter(BUILDINGID == 0) %>%
+  select(WAP006:WAP517, FLOOR)
+ValB0$FLOOR <- as.numeric(ValB0$FLOOR)
+ValB0$FLOOR <- as.factor(ValB0$FLOOR)
 
-#deploy model on validation data
+ValB1 <-  Val %>%
+  filter(BUILDINGID == 1) %>%
+  select(WAP006:WAP517, FLOOR)
+ValB1$FLOOR <- as.numeric(ValB1$FLOOR)
+ValB1$FLOOR <- as.factor(ValB1$FLOOR)
 
-FloorValB0 <- select(ValB0, WAP006:WAP517)
+ValB2 <- Val %>%
+  filter(BUILDINGID == 2) %>%
+  select(WAP006:WAP517, FLOOR)
 
 #make predictions lat using wifi3 model
 PredFlB0gbm <- predict(F_gbmB0, ValB0)
@@ -101,10 +115,36 @@ postResample(PredFlB1gbm, ValB1$FLOOR)
 postResample(PredFlB2gbm, ValB2$FLOOR)
 
 #building0
-Accuracy       Kappa 
-0.01492537 -0.27199180 ##what?!?!
+Accuracy     Kappa 
+0.9738806    0.9631005 
+#14 errors
+            Reference
+Prediction    1   2   3   4
+          1  76   1   1   0
+          2   2 206   5   0
+          3   0   0 157   2
+          4   0   1   2  83
 
 #building 1
+Accuracy     Kappa 
+0.7785016    0.6797865 
+   
+             Reference
+Prediction   1  2  3  4
+          1 21  1  0  0
+          2  5 94  1  0
+          3  3 45 82  5
+          4  1  3  4 42
 
 
 #building 2
+Accuracy     Kappa 
+0.8731343    0.8269391
+
+             Reference
+Prediction    0   1   2   3   4
+          0  21   1   0   0   1
+          1   3 109   3   0   0
+          2   0   1  47   0   0
+          3   0   0   4  40  21
+          4   0   0   0   0  17

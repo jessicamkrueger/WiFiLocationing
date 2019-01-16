@@ -50,32 +50,32 @@ testing2 <- FLRB2[-inTraining2,]
 fitControl <- trainControl(method = "repeatedcv", number = 2, repeats = 1)
 
 #train classification model
-F_knnB0 <- train(FLOOR~., data = training0, method = "knn", trControl=fitControl)
-F_knnB1 <- train(FLOOR~., data = training1, method = "knn", trControl=fitControl)
-F_knnB2 <- train(FLOOR~., data = training2, method = "knn", trControl=fitControl)
+F_rfB0 <- train(FLOOR~., data = training0, method = "rf", trControl=fitControl)
+F_rfB1 <- train(FLOOR~., data = training1, method = "rf", trControl=fitControl)
+F_rfB2 <- train(FLOOR~., data = training2, method = "rf", trControl=fitControl)
 
 #make predictions
-predF_knnB0 <- predict(F_knnB0, testing0)
-predF_knnB1 <- predict(F_knnB1, testing1)
-predF_knnB2 <- predict(F_knnB2, testing2)
+predF_rfB0 <- predict(F_rfB0, testing0)
+predF_rfB1 <- predict(F_rfB1, testing1)
+predF_rfB2 <- predict(F_rfB2, testing2)
 
 #performace measurment
-postResample(predF_knnB0, testing0$FLOOR)
-postResample(predF_knnB1, testing1$FLOOR)
-postResample(predF_knnB2, testing2$FLOOR)
+postResample(predF_rfB0, testing0$FLOOR)
+postResample(predF_dtB1, testing1$FLOOR)
+postResample(predF_dtB2, testing2$FLOOR)
 
 # output
 #Building 0
 Accuracy     Kappa 
-0.9992366 0.9989777 
+0.9969466    0.9959100 
 
 #Building 1
 Accuracy     Kappa 
-0.9976690 0.9968609
+0.6099456    0.4626501 
 
 #Building 2
-Accuracy    Kappa 
-0.999049 0.998776 
+Accuracy     Kappa 
+0.4108417    0.2160599
 
 #test on validation data
 
@@ -110,30 +110,3 @@ PredFlB2 <- predict(F_knnB2, ValB2)
 postResample(PredFlB0, ValB0$FLOOR)
 postResample(PredFlB1, ValB1$FLOOR)
 postResample(PredFlB2, ValB2$FLOOR)
-
-#building0
-Accuracy     Kappa 
-0.9738806    0.9630649 
-
-#building 1
-Accuracy     Kappa 
-0.7687296    0.6681132 
-
-            Reference
-Prediction   1  2  3  4
-          1 20  4  0  0
-          2  4 92  1  0
-          3  6 44 79  2
-          4  0  3  7 45
-
-#building 2
-Accuracy     Kappa 
-0.9104478    0.8783569 
-#21 errors
-             Reference
-Prediction    0   1   2   3   4
-          0  22   1   0   0   2
-          1   2 109   1   0   0
-          2   0   1  49   0   0
-          3   0   0   4  40  13
-          4   0   0   0   0  24
