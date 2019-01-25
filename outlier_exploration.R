@@ -208,7 +208,10 @@ ggplot(BadTotals, aes(USERID, Percent)) +
 
 #final decision, remove all of user 6 and rest of the "bad" data
 no6 <- filter(wifi3, USERID != 6)
-wifi5 <- filter(no6, WAP061 <= -30 & WAP062 <= -30 & WAP065 <= -30 & 
+wifi5 <- filter_at(no6, vars(WAP151:WAP519), any_vars(.<=-30))
+                
+                
+                WAP061 <= -30 & WAP062 <= -30 & WAP065 <= -30 & 
                   WAP066 <= -30 & WAP105 <= -30 & WAP084 <= -30 & WAP085 <= -30 &
                   WAP080 <= -30 & WAP081 <= -30 & WAP121 <= -30 & WAP122 <= -30 &
                   WAP087 <= -30 & WAP262 <= -30 & WAP501 <= -30 & WAP495 <= -30 &

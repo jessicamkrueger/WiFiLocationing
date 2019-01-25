@@ -13,7 +13,7 @@ wifi5 <- readRDS("wifi5.rds")
 
 
 #remove all features other than WAPs and Latitude
-B5 <- select(wifi5, WAP006:WAP517, BUILDINGID)
+B5 <- select(wifi6, WAP006:WAP517, BUILDINGID)
 
 
 #trying running model on entire dataset to predict building
@@ -30,15 +30,16 @@ fitControl <- trainControl(method = "repeatedcv", number = 2, repeats = 1)
 #train classification model
 B_gbm <- train(BUILDINGID~., data = training2, method = "gbm", trControl=fitControl, verbose = FALSE)
 
-
+saveRDS(B_gbm, "mod_Bldg_gbm.rds")
+        
 #make predictions
 predB_gbm <- predict(B_gbm, testing2)
 
 #performace measurment
 postResample(predB_gbm, testing2$BUILDINGID)
 # output
-Accuracy     Kappa 
-0.9983062 0.9973835 
+Accuracy    Kappa 
+1           1 
 
 
 #check confusion matrix

@@ -54,6 +54,10 @@ F_gbmB0 <- train(FLOOR~., data = training0, method = "gbm", trControl=fitControl
 F_gbmB1 <- train(FLOOR~., data = training1, method = "gbm", trControl=fitControl, verbose = FALSE)
 F_gbmB2 <- train(FLOOR~., data = training2, method = "gbm", trControl=fitControl, verbose = FALSE)
 
+saveRDS(F_gbmB0, "mod_Flr_B0.rds")
+saveRDS(F_gbmB1, "mod_Flr_B1.rds")
+saveRDS(F_gbmB2, "mod_Flr_B2.rds")
+
 #make predictions
 predF_gbmB0 <- predict(F_gbmB0, testing0)
 predF_gbmB1 <- predict(F_gbmB1, testing1)
@@ -89,20 +93,17 @@ Val <- readRDS("ValClean.rds")
 wifi6 <- readRDS("wifi6.rds")
 
 ValB0 <-  Val %>%
-  filter(BUILDINGID == 0) %>%
-  select(WAP006:WAP517, FLOOR)
+  filter(BUILDINGID == 0)
 ValB0$FLOOR <- as.numeric(ValB0$FLOOR)
 ValB0$FLOOR <- as.factor(ValB0$FLOOR)
 
 ValB1 <-  Val %>%
-  filter(BUILDINGID == 1) %>%
-  select(WAP006:WAP517, FLOOR)
+  filter(BUILDINGID == 1)
 ValB1$FLOOR <- as.numeric(ValB1$FLOOR)
 ValB1$FLOOR <- as.factor(ValB1$FLOOR)
 
 ValB2 <- Val %>%
-  filter(BUILDINGID == 2) %>%
-  select(WAP006:WAP517, FLOOR)
+  filter(BUILDINGID == 2) 
 
 #make predictions lat using wifi3 model
 PredFlB0gbm <- predict(F_gbmB0, ValB0)
@@ -148,3 +149,72 @@ Prediction    0   1   2   3   4
           2   0   1  47   0   0
           3   0   0   4  40  21
           4   0   0   0   0  17
+  
+#Plot errors on floor predictions on validatin data                  
+#Add prediction column to Val data
+ValB0$FLpred <- PredFlB0gbm
+ValB0 <- mutate(ValB0, Error = (FLpred == FLOOR))
+
+ValB1$FLpred <- PredFlB1gbm
+ValB1 <- mutate(ValB1, Error = (FLpred == FLOOR))
+
+ValB2$FLpred <- PredFlB2gbm
+ValB2 <- mutate(ValB2, Error = (FLpred == FLOOR))
+
+ggplot(ValB0, aes(LONGITUDE, LATITUDE)) +
+  geom_point(aes(color = Error), alpha = .5) +
+  labs(title = "Floor Prediction Errors - BLDG 0") +
+  scale_colour_manual(labels = c("Error", "No Error"), values = c("dark blue", "light gray")) +
+  facet_wrap(~FLOOR) +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(), 
+        axis.ticks.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.line = element_line(colour = "light gray"),
+        axis.text.x =  element_blank(),
+        axis.text.y =  element_blank(),
+        axis.title.x = element_text(colour = "light gray"),
+        axis.title.y = element_text(colour = "light gray"),
+        plot.title = element_text(color= "dark gray"),
+        legend.title = element_blank())
+
+ggplot(ValB1, aes(LONGITUDE, LATITUDE)) +
+  geom_point(aes(color = Error), alpha = .5) +
+  labs(title = "Floor Prediction Errors - BLDG 1") +
+  scale_colour_manual(labels = c("Error", "No Error"), values = c("dark blue", "light gray")) +
+  facet_wrap(~FLOOR) +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(), 
+        axis.ticks.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.line = element_line(colour = "light gray"),
+        axis.text.x =  element_blank(),
+        axis.text.y =  element_blank(),
+        axis.title.x = element_text(colour = "light gray"),
+        axis.title.y = element_text(colour = "light gray"),
+        plot.title = element_text(color= "dark gray"),
+        legend.title = element_blank())
+
+ggplot(ValB2, aes(LONGITUDE, LATITUDE)) +
+  geom_point(aes(color = Error), alpha = .5) +
+  labs(title = "Floor Prediction Errors - BLDG 2") +
+  scale_colour_manual(labels = c("Error", "No Error"), values = c("dark blue", "light gray")) +
+  facet_wrap(~FLOOR) +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(), 
+        axis.ticks.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.line = element_line(colour = "light gray"),
+        axis.text.x =  element_blank(),
+        axis.text.y =  element_blank(),
+        axis.title.x = element_text(colour = "light gray"),
+        axis.title.y = element_text(colour = "light gray"),
+        plot.title = element_text(color= "dark gray"),
+        legend.title = element_blank())
+
+saveRDS(ValB0, "ValB0.rds")
+saveRDS(ValB1, "ValB1.rds")
+saveRDS(ValB2, "ValB2.rds")

@@ -120,8 +120,10 @@ WAPs <- names(mean100)
 
 wifi2 <- select(wifi, -WAPs) #removes all WAPs with only 100s
 
-#now change 100 values to -101
-wifi2[wifi2==100] <- -101
+#now change 100 values to -105
+wifi2[wifi2 == 100] <- -105
+
+wifi2$SPACEID[wifi2$SPACEID == -105] <- 100
 
 #find columns that have low max WAP value
 maxValue <- apply(wifi2, 2, function(x) max(x, na.rm = TRUE))
